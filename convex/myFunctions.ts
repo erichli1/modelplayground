@@ -1,78 +1,65 @@
-import { v } from "convex/values";
-import { query, mutation, action } from "./_generated/server";
-import { api } from "./_generated/api";
+import { internalMutation, query } from "./_generated/server";
+import { PROVIDERS_AND_MODELS, filterNonNull } from "./utils";
 
-// Write your Convex functions in any file inside this directory (`convex`).
-// See https://docs.convex.dev/functions for more.
-
-// You can read data from the database via a query:
-export const listNumbers = query({
-  // Validators for arguments.
-  args: {
-    count: v.number(),
-  },
-
-  // Query implementation.
-  handler: async (ctx, args) => {
-    //// Read the database as many times as you need here.
-    //// See https://docs.convex.dev/database/reading-data.
-    const numbers = await ctx.db
-      .query("numbers")
-      // Ordered by _creationTime, return most recent
-      .order("desc")
-      .take(args.count);
-    return {
-      viewer: (await ctx.auth.getUserIdentity())?.name ?? null,
-      numbers: numbers.toReversed().map((number) => number.value),
-    };
+export const getProviders = query({
+  handler: async (ctx) => {
+    return await ctx.db.query("providers").collect();
   },
 });
 
-// You can write data to the database via a mutation:
-export const addNumber = mutation({
-  // Validators for arguments.
-  args: {
-    value: v.number(),
-  },
+export const getModels = query({
+  handler: async (ctx) => {
+    const providers = await ctx.db.query("providers").collect();
+    const models = await ctx.db.query("models").collect();
 
-  // Mutation implementation.
-  handler: async (ctx, args) => {
-    //// Insert or modify documents in the database here.
-    //// Mutations can also read from the database like queries.
-    //// See https://docs.convex.dev/database/writing-data.
+    const modelsWithProvider = models.map((model) => {
+      const identifiedProvider = providers.find(
+        (provider) => provider._id === model.providerId
+      );
 
-    const id = await ctx.db.insert("numbers", { value: args.value });
+      return identifiedProvider === undefined
+        ? null
+        : {
+            ...model,
+            provider: identifiedProvider,
+          };
+    });
 
-    console.log("Added new document with id:", id);
-    // Optionally, return a value from your mutation.
-    // return id;
+    return filterNonNull(modelsWithProvider);
   },
 });
 
-// You can fetch data from and send data to third-party APIs via an action:
-export const myAction = action({
-  // Validators for arguments.
-  args: {
-    first: v.number(),
-    second: v.string(),
+export const addSupportedProvidersAndModels = internalMutation({
+  handler: async (ctx) => {
+    await Promise.all(
+      PROVIDERS_AND_MODELS.map(async (providerAndModels) => {
+        const providerId = await ctx.db.insert("providers", {
+          name: providerAndModels.provider,
+        });
+        await Promise.all(
+          providerAndModels.models.map((model) =>
+            ctx.db.insert("models", {
+              providerId: providerId,
+              llm: model.llm,
+              inputCostPerMillionTokens: model.inputCostPerMillionTokens,
+              outputCostPerMillionTokens: model.outputCostPerMillionTokens,
+              contextWindow: model.contextWindow,
+              notes: model.notes,
+              lastUpdated: Date.now(),
+            })
+          )
+        );
+      })
+    );
   },
+});
 
-  // Action implementation.
-  handler: async (ctx, args) => {
-    //// Use the browser-like `fetch` API to send HTTP requests.
-    //// See https://docs.convex.dev/functions/actions#calling-third-party-apis-and-using-npm-packages.
-    // const response = await ctx.fetch("https://api.thirdpartyservice.com");
-    // const data = await response.json();
+export const clearAll = internalMutation({
+  handler: async (ctx) => {
+    const models = await ctx.db.query("models").collect();
+    await Promise.all(models.map((model) => ctx.db.delete(model._id)));
 
-    //// Query data by running Convex queries.
-    const data = await ctx.runQuery(api.myFunctions.listNumbers, {
-      count: 10,
-    });
-    console.log(data);
-
-    //// Write data by running Convex mutations.
-    await ctx.runMutation(api.myFunctions.addNumber, {
-      value: args.first,
-    });
+    const providers = await ctx.db.query("providers").collect();
+    await Promise.all(providers.map((provider) => ctx.db.delete(provider._id)));
   },
 });

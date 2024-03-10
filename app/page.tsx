@@ -23,44 +23,29 @@ import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-
-const API_PROVIDERS = [
-  { label: "OpenAI", keyName: "OPENAI_API_KEY" },
-  {
-    label: "Anthropic",
-    keyName: "ANTHROPIC_API_KEY",
-  },
-];
-
-const MODELS = [
-  {
-    llm: "gpt-4-turbo-0125",
-    provider: "OpenAI",
-  },
-  {
-    llm: "claude-3-opus",
-    provider: "Anthropic",
-  },
-];
-
-type Model = {
-  llm: string;
-  provider: string;
-};
-
-type Message = {
-  role: "user" | "assistant" | "system";
-  content: string;
-};
+import { Message } from "@/lib/sync";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
 
 export default function Home() {
+  const providers = useQuery(api.myFunctions.getProviders);
+  const models = useQuery(api.myFunctions.getModels);
+
+  if (providers === undefined || models === undefined)
+    return (
+      <div className="flex items-center justify-center h-screen mx-auto">
+        Loading models...
+      </div>
+    );
+
   return (
     <>
       <main className="h-screen flex flex-col">
         <header className="px-4 py-2 border-b">which model?</header>
         <ResizablePanelGroup direction="horizontal" className="w-full">
           <ResizablePanel defaultSize={15} className="flex flex-col">
-            <APIKeysPanel providers={API_PROVIDERS} />
+            <APIKeysPanel providers={providers} />
           </ResizablePanel>
           <ResizableHandle />
           <ResizablePanel
@@ -76,7 +61,7 @@ export default function Home() {
           </ResizablePanel>
           <ResizableHandle />
           <ResizablePanel defaultSize={35}>
-            <ComparePanel models={MODELS} />
+            <ComparePanel models={models} />
           </ResizablePanel>
         </ResizablePanelGroup>
       </main>
@@ -84,11 +69,7 @@ export default function Home() {
   );
 }
 
-function APIKeysPanel({
-  providers,
-}: {
-  providers: Array<{ label: string; keyName: string }>;
-}) {
+function APIKeysPanel({ providers }: { providers: Array<Doc<"providers">> }) {
   const [showKeys, setShowKeys] = useState<boolean>(false);
 
   return (
@@ -114,7 +95,7 @@ function APIKeysPanel({
             className="grid w-full items-center gap-1.5 px-0.5"
             key={`api-key-provider-${index}`}
           >
-            <Label>{provider.label}</Label>
+            <Label>{provider.name}</Label>
             <Input type={showKeys ? "text" : "password"} />
           </div>
         ))}
@@ -240,10 +221,16 @@ function PromptPanel() {
   );
 }
 
-function ComparePanel({ models }: { models: Array<Model> }) {
+function ComparePanel({
+  models,
+}: {
+  models: (typeof api.myFunctions.getModels)["_returnType"];
+}) {
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [modelsToCompare, setModelsToCompare] = useState<
-    Array<Model & { id: string }>
+    Array<
+      (typeof api.myFunctions.getModels)["_returnType"][0] & { uuid: string }
+    >
   >([]);
 
   return (
@@ -262,11 +249,8 @@ function ComparePanel({ models }: { models: Array<Model> }) {
               <SelectContent>
                 <SelectGroup>
                   {models.map((model) => (
-                    <SelectItem
-                      value={`${model.provider}-${model.llm}`}
-                      key={`selectModelToAdd-${model.provider}-${model.llm}`}
-                    >
-                      {`${model.llm} (${model.provider})`}
+                    <SelectItem value={model._id} key={model._id}>
+                      {`${model.llm} (${model.provider.name})`}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -278,12 +262,12 @@ function ComparePanel({ models }: { models: Array<Model> }) {
               disabled={selectedModel === ""}
               onClick={() => {
                 const foundModel = models.find(
-                  (model) => selectedModel === `${model.provider}-${model.llm}`
+                  (model) => selectedModel === model._id
                 );
                 if (foundModel) {
                   setModelsToCompare([
                     ...modelsToCompare,
-                    { ...foundModel, id: uuidv4() },
+                    { ...foundModel, uuid: uuidv4() },
                   ]);
                   setSelectedModel("");
                 }
@@ -293,18 +277,18 @@ function ComparePanel({ models }: { models: Array<Model> }) {
             </Button>
           </div>
 
-          {modelsToCompare.map((model, index) => (
-            <Card key={`modelCompare-${model.provider}-${model.llm}-${index}`}>
+          {modelsToCompare.map((model) => (
+            <Card key={model.uuid}>
               <CardContent className="text-sm p-4">
                 <div className="flex flex-row justify-between items-center">
-                  <p className="font-bold">{`${model.llm} (${model.provider})`}</p>
+                  <p className="font-bold">{`${model.llm} (${model.provider.name})`}</p>
                   <Button
                     size="icon"
                     variant="ghost"
                     className="h-5 w-5"
                     onClick={() =>
                       setModelsToCompare(
-                        modelsToCompare.filter((m) => m.id !== model.id)
+                        modelsToCompare.filter((m) => m.uuid !== model.uuid)
                       )
                     }
                   >
