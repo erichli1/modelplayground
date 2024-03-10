@@ -27,6 +27,7 @@ import { Message } from "@/lib/sync";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
+import Image from "next/image";
 
 export default function Home() {
   const providers = useQuery(api.myFunctions.getProviders);
@@ -250,7 +251,17 @@ function ComparePanel({
                 <SelectGroup>
                   {models.map((model) => (
                     <SelectItem value={model._id} key={model._id}>
-                      {`${model.llm} (${model.provider.name})`}
+                      <div className="flex flex-row gap-2 items-center">
+                        <Image
+                          src={`/${model.provider.name}.png`}
+                          height={10}
+                          width={10}
+                          alt={`${model.provider.name} logo`}
+                          className="h-4 w-4 rounded-[2px]"
+                          unoptimized
+                        />
+                        {`${model.llm} (${model.provider.name})`}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -281,7 +292,17 @@ function ComparePanel({
             <Card key={model.uuid}>
               <CardContent className="text-sm p-4">
                 <div className="flex flex-row justify-between items-center">
-                  <p className="font-bold">{`${model.llm} (${model.provider.name})`}</p>
+                  <div className="flex flex-row gap-2 items-center">
+                    <Image
+                      src={`/${model.provider.name}.png`}
+                      height={10}
+                      width={10}
+                      alt={`${model.provider.name} logo`}
+                      className="h-4 w-4 rounded-[2px]"
+                      unoptimized
+                    />
+                    <p className="font-bold">{`${model.llm} (${model.provider.name})`}</p>
+                  </div>
                   <Button
                     size="icon"
                     variant="ghost"
