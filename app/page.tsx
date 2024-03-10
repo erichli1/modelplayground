@@ -59,12 +59,15 @@ export default function Home() {
       <main className="h-screen flex flex-col">
         <header className="px-4 py-2 border-b">which model?</header>
         <ResizablePanelGroup direction="horizontal" className="w-full">
-          <ResizablePanel defaultSize={20} className="flex flex-col">
+          <ResizablePanel defaultSize={15} className="flex flex-col">
             <APIKeysPanel providers={API_PROVIDERS} />
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel defaultSize={40} className="flex flex-col">
-            <div className="flex-grow">
+          <ResizablePanel
+            defaultSize={50}
+            className="flex flex-col justify-between"
+          >
+            <div className="h-full overflow-auto">
               <PromptPanel />
             </div>
             <div className="px-4 py-2 border-t flex justify-end">
@@ -72,7 +75,7 @@ export default function Home() {
             </div>
           </ResizablePanel>
           <ResizableHandle />
-          <ResizablePanel defaultSize={40}>
+          <ResizablePanel defaultSize={35}>
             <ComparePanel models={MODELS} />
           </ResizablePanel>
         </ResizablePanelGroup>
@@ -154,7 +157,7 @@ function PromptPanel() {
   };
 
   return (
-    <ScrollArea className="h-full p-4 overflow-auto">
+    <ScrollArea className="h-full pt-4 px-4 overflow-auto">
       <div className="flex flex-col gap-4 overflow-auto">
         <p className="font-bold">Add prompt</p>
         <div className="flex flex-col gap-2">
@@ -229,6 +232,8 @@ function PromptPanel() {
             <CirclePlus className="h-4 w-4 mr-2" />
             New Message
           </Button>
+
+          <div></div>
         </div>
       </div>
     </ScrollArea>

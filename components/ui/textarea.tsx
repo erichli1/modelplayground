@@ -15,7 +15,8 @@ const useAutoResizeTextarea = (
     const updateTextareaHeight = () => {
       if (ref) {
         ref.style.height = "auto";
-        ref.style.height = ref?.scrollHeight + "px";
+        // add 5px to the scrollHeight to prevent the textarea from scrolling
+        ref.style.height = ref?.scrollHeight + 5 + "px";
       }
     };
 
