@@ -149,7 +149,19 @@ function APIKeysPanel({
             className="grid w-full items-center gap-1.5 px-0.5"
             key={`api-key-provider-${provider._id}`}
           >
-            <Label>{provider.name}</Label>
+            <Label>
+              <div className="flex flex-row gap-1 items-center">
+                <Image
+                  src={`/${provider.name}.png`}
+                  height={10}
+                  width={10}
+                  alt={`${provider.name} logo`}
+                  className="h-4 w-4 rounded-[2px]"
+                  unoptimized
+                />
+                {provider.name}
+              </div>
+            </Label>
             <Input
               type={showKeys ? "text" : "password"}
               onChange={(e) =>
