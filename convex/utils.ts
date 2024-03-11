@@ -107,7 +107,7 @@ export const PROVIDERS_AND_MODELS: Array<{
         inputCostPerMillionTokens: 0,
         outputCostPerMillionTokens: 0,
         notes:
-          "Rated limited to 60 QPM. Free per ai.google.dev/pricing as of 3/9/24",
+          "Rate limited to 60 QPM. Free per ai.google.dev/pricing as of 3/9/24",
       },
     ],
   },

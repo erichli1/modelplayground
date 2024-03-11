@@ -102,6 +102,7 @@ export default function Home() {
               models={models}
               modelsToCompare={modelsToCompare}
               setModelsToCompare={setModelsToCompare}
+              apiKeys={apiKeys}
             />
           </ResizablePanel>
         </ResizablePanelGroup>
@@ -313,10 +314,12 @@ function ComparePanel({
   models,
   modelsToCompare,
   setModelsToCompare,
+  apiKeys,
 }: {
   models: (typeof api.myFunctions.getModels)["_returnType"];
   modelsToCompare: ModelsToCompareType;
   setModelsToCompare: Dispatch<SetStateAction<ModelsToCompareType>>;
+  apiKeys: Array<{ provider: Doc<"providers">; key: string }>;
 }) {
   const [selectedModel, setSelectedModel] = useState<string>("");
 
@@ -375,38 +378,118 @@ function ComparePanel({
           </div>
 
           {modelsToCompare.map((model) => (
-            <Card key={model.uuid}>
-              <CardContent className="text-sm p-4">
-                <div className="flex flex-row justify-between items-center">
-                  <div className="flex flex-row gap-2 items-center">
-                    <Image
-                      src={`/${model.provider.name}.png`}
-                      height={10}
-                      width={10}
-                      alt={`${model.provider.name} logo`}
-                      className="h-4 w-4 rounded-[2px]"
-                      unoptimized
-                    />
-                    <p className="font-bold">{`(${model.provider.name}) ${model.llm}`}</p>
-                  </div>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-5 w-5"
-                    onClick={() =>
-                      setModelsToCompare(
-                        modelsToCompare.filter((m) => m.uuid !== model.uuid)
-                      )
-                    }
-                  >
-                    <CircleMinus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <ModelCard
+              key={model.uuid}
+              model={model}
+              apiKeys={apiKeys}
+              onDeleteClick={() =>
+                setModelsToCompare(
+                  modelsToCompare.filter((m) => m.uuid !== model.uuid)
+                )
+              }
+            />
+            // <Card key={model.uuid} className="border-red-600">
+            //   <CardContent className="text-sm p-4 flex flex-col gap-2">
+            //     <div className="flex flex-row justify-between items-center">
+            //       <div className="flex flex-row gap-2 items-center">
+            //         <Image
+            //           src={`/${model.provider.name}.png`}
+            //           height={10}
+            //           width={10}
+            //           alt={`${model.provider.name} logo`}
+            //           className="h-4 w-4 rounded-[2px]"
+            //           unoptimized
+            //         />
+            //         <p className="font-bold">{`(${model.provider.name}) ${model.llm}`}</p>
+            //       </div>
+            //       <Button
+            //         size="icon"
+            //         variant="ghost"
+            //         className="h-5 w-5"
+            //         onClick={() =>
+            //           setModelsToCompare(
+            //             modelsToCompare.filter((m) => m.uuid !== model.uuid)
+            //           )
+            //         }
+            //       >
+            //         <CircleMinus className="h-4 w-4" />
+            //       </Button>
+            //     </div>
+            //     {(apiKeys.find(
+            //       (apiKey) => apiKey.provider._id === model.provider._id
+            //     )?.key === "" ||
+            //       model.notes) && (
+            //       <p className="italic">
+            //         {apiKeys.find(
+            //           (apiKey) => apiKey.provider._id === model.provider._id
+            //         )?.key === "" && (
+            //           <span className="text-red-600">
+            //             Please enter the {model.provider.name} API key.{" "}
+            //           </span>
+            //         )}
+            //         {model.notes}
+            //       </p>
+            //     )}
+            //   </CardContent>
+            // </Card>
           ))}
         </div>
       </div>
     </ScrollArea>
+  );
+}
+
+function ModelCard({
+  model,
+  apiKeys,
+  onDeleteClick,
+}: {
+  model: ModelsToCompareType[0];
+  apiKeys: Array<{ provider: Doc<"providers">; key: string }>;
+  onDeleteClick: () => void;
+}) {
+  const identifiedProviderKey = apiKeys.find(
+    (apiKey) => apiKey.provider._id === model.provider._id
+  );
+
+  return (
+    <Card
+      key={model.uuid}
+      className={identifiedProviderKey?.key === "" ? "border-red-600" : ""}
+    >
+      <CardContent className="text-sm p-4 flex flex-col gap-2">
+        <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row gap-2 items-center">
+            <Image
+              src={`/${model.provider.name}.png`}
+              height={10}
+              width={10}
+              alt={`${model.provider.name} logo`}
+              className="h-4 w-4 rounded-[2px]"
+              unoptimized
+            />
+            <p className="font-bold">{`(${model.provider.name}) ${model.llm}`}</p>
+          </div>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-5 w-5"
+            onClick={() => onDeleteClick()}
+          >
+            <CircleMinus className="h-4 w-4" />
+          </Button>
+        </div>
+        {(identifiedProviderKey?.key === "" || model.notes) && (
+          <p className="italic">
+            {identifiedProviderKey?.key === "" && (
+              <span className="text-red-600">
+                Please enter the {model.provider.name} API key.{" "}
+              </span>
+            )}
+            {model.notes}
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 }
