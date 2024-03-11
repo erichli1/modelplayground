@@ -483,7 +483,7 @@ function ModelCard({
           <p className="italic">
             {identifiedProviderKey?.key === "" && (
               <span className="text-red-600">
-                Please enter the {model.provider.name} API key.{" "}
+                Please enter your {model.provider.name} API key.{" "}
               </span>
             )}
             {model.notes}
