@@ -23,11 +23,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Message } from "@/lib/sync";
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import Image from "next/image";
+import { Message } from "@/convex/utils";
 
 type ModelsToCompareType = Array<
   (typeof api.myFunctions.getModels)["_returnType"][0] & { uuid: string }
@@ -36,6 +36,7 @@ type ModelsToCompareType = Array<
 export default function Home() {
   const providers = useQuery(api.myFunctions.getProviders);
   const models = useQuery(api.myFunctions.getModels);
+  const runModel = useAction(api.myActions.runModel);
 
   const [apiKeys, setApiKeys] = useState<
     Array<{ provider: Doc<"providers">; key: string }>
@@ -70,10 +71,27 @@ export default function Home() {
       </div>
     );
 
-  const runTests = () => {
-    console.log(apiKeys);
-    console.log(messages);
-    console.log(modelsToCompare);
+  const runTests = async () => {
+    await Promise.all(
+      modelsToCompare.map((model) => {
+        const identifiedApiKey = apiKeys.find(
+          (apiKey) => apiKey.provider._id === model.provider._id
+        )?.key;
+        if (identifiedApiKey === undefined) return Promise.resolve();
+
+        return runModel({
+          providerId: model.provider._id,
+          modelId: model._id,
+          messages: messages.map((message) => ({
+            role: message.role,
+            content: message.content,
+          })),
+          apiKey: identifiedApiKey,
+        }).then((output) => {
+          console.log(output);
+        });
+      })
+    );
   };
 
   return (
@@ -93,7 +111,13 @@ export default function Home() {
               <PromptPanel messages={messages} setMessages={setMessages} />
             </div>
             <div className="px-4 py-2 border-t flex justify-end">
-              <Button onClick={() => runTests()}>Run</Button>
+              <Button
+                onClick={() => {
+                  runTests().catch(console.error);
+                }}
+              >
+                Run
+              </Button>
             </div>
           </ResizablePanel>
           <ResizableHandle />

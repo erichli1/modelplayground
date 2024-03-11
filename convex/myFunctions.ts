@@ -1,3 +1,4 @@
+import { v } from "convex/values";
 import { internalMutation, query } from "./_generated/server";
 import { PROVIDERS_AND_MODELS, filterNonNull } from "./utils";
 
@@ -61,5 +62,19 @@ export const clearAll = internalMutation({
 
     const providers = await ctx.db.query("providers").collect();
     await Promise.all(providers.map((provider) => ctx.db.delete(provider._id)));
+  },
+});
+
+export const getModelFromId = query({
+  args: { id: v.id("models") },
+  handler: async (ctx, { id }) => {
+    return await ctx.db.get(id);
+  },
+});
+
+export const getProviderFromId = query({
+  args: { id: v.id("providers") },
+  handler: async (ctx, { id }) => {
+    return await ctx.db.get(id);
   },
 });

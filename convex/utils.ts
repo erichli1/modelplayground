@@ -1,4 +1,17 @@
+import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
+
+export const ConvexMessageType = v.object({
+  role: v.union(v.literal("user"), v.literal("assistant"), v.literal("system")),
+  content: v.string(),
+});
+
+export type Message = typeof ConvexMessageType.type;
+
+export type ModelOutput = {
+  output: string;
+  error: boolean;
+};
 
 export const PROVIDERS_AND_MODELS: Array<{
   provider: string;
