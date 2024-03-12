@@ -18,7 +18,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Brain, CircleMinus, CirclePlus, Eye, EyeOff } from "lucide-react";
+import {
+  Brain,
+  CircleMinus,
+  CirclePlus,
+  Diff,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Textarea } from "@/components/ui/textarea";
@@ -179,7 +186,7 @@ function APIKeysPanel({
   return (
     <ScrollArea className="h-full p-4 overflow-auto">
       <div className="flex flex-col gap-4">
-        <div className="flex flex-row gap-1 items-center">
+        <div className="flex flex-row gap-2 items-center">
           <p className="font-bold">Add API keys</p>
           <TooltipProvider delayDuration={0}>
             <Tooltip>
@@ -188,7 +195,7 @@ function APIKeysPanel({
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowKeys(!showKeys)}
-                  className="h-full"
+                  className="h-full w-full"
                 >
                   {showKeys ? (
                     <Eye className="h-4 w-4" />
@@ -315,12 +322,13 @@ function PromptPanel({
           <Button
             variant="ghost"
             size="icon"
-            className="h-full"
+            className="h-full w-full"
             onClick={() => {
               tryBenchmark(benchmark);
             }}
           >
             {benchmark === "MMLU" && <Brain className="h-4 w-4" />}
+            {benchmark === "GSM8K" && <Diff className="h-4 w-4" />}
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -333,9 +341,10 @@ function PromptPanel({
   return (
     <ScrollArea className="h-full pt-4 px-4 overflow-auto">
       <div className="flex flex-col gap-4 overflow-auto">
-        <div className="flex flex-row gap-1 items-center">
+        <div className="flex flex-row gap-2 items-center">
           <p className="font-bold">Add Prompt</p>
           <TryBenchmarkIcon benchmark="MMLU" />
+          <TryBenchmarkIcon benchmark="GSM8K" />
         </div>
         {benchmark !== "" && (
           <p className="text-sm">
