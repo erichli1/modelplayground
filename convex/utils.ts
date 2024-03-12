@@ -111,19 +111,19 @@ export const PROVIDERS_AND_MODELS: Array<{
       },
     ],
   },
-  {
-    provider: "Google",
-    models: [
-      {
-        llm: "gemini-1.0-pro-001",
-        contextWindow: 30720,
-        inputCostPerMillionTokens: 0,
-        outputCostPerMillionTokens: 0,
-        notes:
-          "Rate limited to 60 QPM. Free per ai.google.dev/pricing as of 3/9/24",
-      },
-    ],
-  },
+  // {
+  //   provider: "Google",
+  //   models: [
+  //     {
+  //       llm: "gemini-1.0-pro-001",
+  //       contextWindow: 30720,
+  //       inputCostPerMillionTokens: 0,
+  //       outputCostPerMillionTokens: 0,
+  //       notes:
+  //         "Rate limited to 60 QPM. Free per ai.google.dev/pricing as of 3/9/24",
+  //     },
+  //   ],
+  // },
   {
     provider: "Mistral",
     models: [
