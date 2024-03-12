@@ -45,10 +45,7 @@ export const runModel = action({
       } else if (provider.name === "Anthropic") {
         return await runAnthropic(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Together") {
-        return {
-          output: "done!",
-          error: false,
-        };
+        return await runTogether(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Groq") {
         return {
           output: "done!",
@@ -115,6 +112,32 @@ export const runAnthropic = action({
     return {
       error: false,
       output: message.content[0].text,
+    };
+  },
+});
+
+export const runTogether = action({
+  args: ProviderType,
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
+    const togetherClient = new OpenAI({
+      apiKey,
+      baseURL: "https://api.together.xyz/v1",
+    });
+
+    const response = await togetherClient.chat.completions.create({
+      model: llm,
+      messages,
+    });
+
+    if (response.choices[0].message.content === null)
+      return {
+        output: "Null response received from provider.",
+        error: true,
+      };
+
+    return {
+      output: response.choices[0].message.content,
+      error: false,
     };
   },
 });
