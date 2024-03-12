@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { CircleMinus, CirclePlus, Eye, EyeOff } from "lucide-react";
+import { Brain, CircleMinus, CirclePlus, Eye, EyeOff } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +28,13 @@ import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import Image from "next/image";
 import { Message, ModelOutput } from "@/convex/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { PossibleBenchmarks, benchmarks } from "@/lib/utils";
 
 type ModelsToCompareType = Array<
   (typeof api.myFunctions.getModels)["_returnType"][0] & {
@@ -174,18 +181,27 @@ function APIKeysPanel({
       <div className="flex flex-col gap-4">
         <div className="flex flex-row gap-1 items-center">
           <p className="font-bold">Add API keys</p>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowKeys(!showKeys)}
-            className="h-full"
-          >
-            {showKeys ? (
-              <Eye className="h-4 w-4" />
-            ) : (
-              <EyeOff className="h-4 w-4" />
-            )}
-          </Button>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowKeys(!showKeys)}
+                  className="h-full"
+                >
+                  {showKeys ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{showKeys ? "Hide API keys" : "Show API keys"}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         {providers.map((provider) => (
           <div
@@ -237,6 +253,9 @@ function PromptPanel({
     >
   >;
 }) {
+  const [benchmark, setBenchmark] = useState<PossibleBenchmarks | "">("");
+  const [benchmarkAnswer, setBenchmarkAnswer] = useState<string>("");
+
   const changeMessageRole = ({
     id,
     newRole,
@@ -256,10 +275,74 @@ function PromptPanel({
     setMessages(newMessages);
   };
 
+  const tryBenchmark = (benchmark: PossibleBenchmarks | "") => {
+    if (benchmark !== "") {
+      const selectedBenchmarkQA =
+        benchmarks[benchmark].qa[
+          Math.floor(Math.random() * benchmarks[benchmark].qa.length)
+        ];
+
+      const benchmarkMessages: Array<Message & { id: string }> = [
+        {
+          role: "system",
+          content: benchmarks[benchmark].system,
+          id: uuidv4(),
+        },
+        {
+          role: "user",
+          content: selectedBenchmarkQA.q,
+          id: uuidv4(),
+        },
+      ];
+
+      setBenchmark(benchmark);
+      setMessages(benchmarkMessages);
+      setBenchmarkAnswer(selectedBenchmarkQA.a);
+    } else {
+      setBenchmark("");
+      setBenchmarkAnswer("");
+    }
+  };
+
+  const TryBenchmarkIcon = ({
+    benchmark,
+  }: {
+    benchmark: PossibleBenchmarks;
+  }) => (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-full"
+            onClick={() => {
+              tryBenchmark(benchmark);
+            }}
+          >
+            {benchmark === "MMLU" && <Brain className="h-4 w-4" />}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Try an example from the {benchmark} benchmark dataset</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+
   return (
     <ScrollArea className="h-full pt-4 px-4 overflow-auto">
       <div className="flex flex-col gap-4 overflow-auto">
-        <p className="font-bold">Add prompt</p>
+        <div className="flex flex-row gap-1 items-center">
+          <p className="font-bold">Add Prompt</p>
+          <TryBenchmarkIcon benchmark="MMLU" />
+        </div>
+        {benchmark !== "" && (
+          <p className="text-sm">
+            You&apos;re using the {benchmark} benchmark. The answer to this
+            example question is {benchmarkAnswer}
+          </p>
+        )}
         <div className="flex flex-col gap-2">
           {messages.map((message) => (
             <div
@@ -275,12 +358,14 @@ function PromptPanel({
                   onClick={
                     message.role === "system"
                       ? undefined
-                      : () =>
+                      : () => {
                           changeMessageRole({
                             id: message.id,
                             newRole:
                               message.role === "user" ? "assistant" : "user",
-                          })
+                          });
+                          tryBenchmark("");
+                        }
                   }
                 >
                   {message.role.toUpperCase()}
@@ -290,6 +375,7 @@ function PromptPanel({
               <Textarea
                 autoSize
                 className="resize-none col-span-8"
+                value={message.content}
                 onChange={(e) => {
                   setMessages((prev) =>
                     prev.map((m) =>
@@ -298,6 +384,7 @@ function PromptPanel({
                         : m
                     )
                   );
+                  tryBenchmark("");
                 }}
               />
 
@@ -306,13 +393,14 @@ function PromptPanel({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() =>
+                    onClick={() => {
                       setMessages(
                         messages.filter(
                           (oldMessage) => oldMessage.id !== message.id
                         )
-                      )
-                    }
+                      );
+                      tryBenchmark("");
+                    }}
                   >
                     <CircleMinus className="h-4 w-4" />
                   </Button>
@@ -339,6 +427,7 @@ function PromptPanel({
                   id: uuidv4(),
                 },
               ]);
+              tryBenchmark("");
             }}
           >
             <CirclePlus className="h-4 w-4 mr-2" />
