@@ -490,7 +490,8 @@ function ModelCard({
         {model.output && (
           <>
             <p>
-              <span>{(model.output.speed / 1000).toFixed(2)}s</span>
+              <span>{(model.output.speed / 1000).toFixed(2)}s, </span>
+              <span>~${model.output.cost}</span>
             </p>
             <p className="whitespace-pre-wrap">{model.output.output}</p>
           </>

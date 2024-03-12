@@ -8,7 +8,11 @@ export const ConvexMessageType = v.object({
 
 export type Message = typeof ConvexMessageType.type;
 
-export type ModelOutput = {
+export type ModelOutput = ProviderOutput & { cost: number };
+
+export const CHARS_TO_TOKEN = 4;
+
+export type ProviderOutput = {
   output: string;
   error: boolean;
   speed: number;

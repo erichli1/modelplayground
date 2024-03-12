@@ -2,7 +2,12 @@
 
 import { v } from "convex/values";
 import { action } from "./_generated/server";
-import { ConvexMessageType, ModelOutput } from "./utils";
+import {
+  CHARS_TO_TOKEN,
+  ConvexMessageType,
+  ModelOutput,
+  ProviderOutput,
+} from "./utils";
 import { api } from "./_generated/api";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
@@ -36,6 +41,7 @@ export const runModel = action({
         output: "Internal error. Provider not found.",
         error: true,
         speed: 0,
+        cost: 0,
       };
     }
 
@@ -45,31 +51,48 @@ export const runModel = action({
     if (model === null) throw new Error("Model not found.");
 
     try {
+      let output: ProviderOutput;
+
       if (provider.name === "OpenAI") {
-        return await runOpenAI(ctx, { llm: model.llm, messages, apiKey });
+        output = await runOpenAI(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Anthropic") {
-        return await runAnthropic(ctx, { llm: model.llm, messages, apiKey });
+        output = await runAnthropic(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Together") {
-        return await runTogether(ctx, { llm: model.llm, messages, apiKey });
+        output = await runTogether(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Groq") {
-        return await runGroq(ctx, { llm: model.llm, messages, apiKey });
+        output = await runGroq(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Mistral") {
-        return await runMistral(ctx, { llm: model.llm, messages, apiKey });
+        output = await runMistral(ctx, { llm: model.llm, messages, apiKey });
       } else {
         throw new Error("Associated provider not implemented.");
       }
+
+      const inputMillionTokens =
+        (messages.reduce((acc, m) => acc + m.content.length, 0) *
+          CHARS_TO_TOKEN) /
+        1e6;
+      const outputMillionTokens = (output.output.length * CHARS_TO_TOKEN) / 1e6;
+
+      return {
+        ...output,
+        cost:
+          inputMillionTokens * model.inputCostPerMillionTokens +
+          outputMillionTokens * model.outputCostPerMillionTokens,
+      };
     } catch (e) {
-      if (typeof e === "string") return { output: e, error: true, speed: 0 };
+      if (typeof e === "string")
+        return { output: e, error: true, speed: 0, cost: 0 };
       else if (e instanceof Error)
-        return { output: e.message, error: true, speed: 0 };
-      else return { output: "An error occurred.", error: true, speed: 0 };
+        return { output: e.message, error: true, speed: 0, cost: 0 };
+      else
+        return { output: "An error occurred.", error: true, speed: 0, cost: 0 };
     }
   },
 });
 
 export const runOpenAI = action({
   args: ProviderType,
-  handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ProviderOutput> => {
     const openai = new OpenAI({ apiKey });
 
     const start = Date.now();
@@ -96,7 +119,7 @@ export const runOpenAI = action({
 
 export const runAnthropic = action({
   args: ProviderType,
-  handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ProviderOutput> => {
     const anthropic = new Anthropic({ apiKey });
 
     const start = Date.now();
@@ -121,7 +144,7 @@ export const runAnthropic = action({
 
 export const runTogether = action({
   args: ProviderType,
-  handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ProviderOutput> => {
     const togetherClient = new OpenAI({
       apiKey,
       baseURL: "https://api.together.xyz/v1",
@@ -151,7 +174,7 @@ export const runTogether = action({
 
 export const runGroq = action({
   args: ProviderType,
-  handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ProviderOutput> => {
     const groq = new Groq({ apiKey });
 
     const start = Date.now();
@@ -171,7 +194,7 @@ export const runGroq = action({
 
 export const runMistral = action({
   args: ProviderType,
-  handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ProviderOutput> => {
     const mistral = new MistralClient(apiKey);
 
     const start = Date.now();
