@@ -104,7 +104,7 @@ export const PROVIDERS_AND_MODELS: Array<{
         outputCostPerMillionTokens: 0.27,
       },
       {
-        llm: "Gemma-7b-it",
+        llm: "gemma-7b-it",
         contextWindow: 8192,
         inputCostPerMillionTokens: 0.1,
         outputCostPerMillionTokens: 0.1,

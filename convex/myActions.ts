@@ -6,6 +6,7 @@ import { ConvexMessageType, ModelOutput } from "./utils";
 import { api } from "./_generated/api";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 
 const ProviderType = {
   llm: v.string(),
@@ -47,10 +48,7 @@ export const runModel = action({
       } else if (provider.name === "Together") {
         return await runTogether(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Groq") {
-        return {
-          output: "done!",
-          error: false,
-        };
+        return await runGroq(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Google") {
         return {
           output: "done!",
@@ -125,6 +123,29 @@ export const runTogether = action({
     });
 
     const response = await togetherClient.chat.completions.create({
+      model: llm,
+      messages,
+    });
+
+    if (response.choices[0].message.content === null)
+      return {
+        output: "Null response received from provider.",
+        error: true,
+      };
+
+    return {
+      output: response.choices[0].message.content,
+      error: false,
+    };
+  },
+});
+
+export const runGroq = action({
+  args: ProviderType,
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
+    const groq = new Groq({ apiKey });
+
+    const response = await groq.chat.completions.create({
       model: llm,
       messages,
     });
