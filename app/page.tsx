@@ -488,7 +488,12 @@ function ModelCard({
           </p>
         )}
         {model.output && (
-          <p className="whitespace-pre-wrap">{model.output.output}</p>
+          <>
+            <p>
+              <span>{(model.output.speed / 1000).toFixed(2)}s</span>
+            </p>
+            <p className="whitespace-pre-wrap">{model.output.output}</p>
+          </>
         )}
       </CardContent>
     </Card>

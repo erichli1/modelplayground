@@ -32,7 +32,11 @@ export const runModel = action({
 
     if (provider === null) {
       console.error("Provider not found.");
-      return { output: "Internal error. Provider not found.", error: true };
+      return {
+        output: "Internal error. Provider not found.",
+        error: true,
+        speed: 0,
+      };
     }
 
     const model = await ctx.runQuery(api.myFunctions.getModelFromId, {
@@ -55,9 +59,10 @@ export const runModel = action({
         throw new Error("Associated provider not implemented.");
       }
     } catch (e) {
-      if (typeof e === "string") return { output: e, error: true };
-      else if (e instanceof Error) return { output: e.message, error: true };
-      else return { output: "An error occurred.", error: true };
+      if (typeof e === "string") return { output: e, error: true, speed: 0 };
+      else if (e instanceof Error)
+        return { output: e.message, error: true, speed: 0 };
+      else return { output: "An error occurred.", error: true, speed: 0 };
     }
   },
 });
@@ -66,20 +71,25 @@ export const runOpenAI = action({
   args: ProviderType,
   handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
     const openai = new OpenAI({ apiKey });
+
+    const start = Date.now();
     const response = await openai.chat.completions.create({
       model: llm,
       messages,
     });
+    const end = Date.now();
 
     if (response.choices[0].message.content === null)
       return {
         output: "Null response received from provider.",
         error: true,
+        speed: 0,
       };
 
     return {
       output: response.choices[0].message.content,
       error: false,
+      speed: end - start,
     };
   },
 });
@@ -89,6 +99,7 @@ export const runAnthropic = action({
   handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
     const anthropic = new Anthropic({ apiKey });
 
+    const start = Date.now();
     const message = await anthropic.messages.create({
       model: llm,
       system: messages[0].content,
@@ -98,10 +109,12 @@ export const runAnthropic = action({
       })),
       max_tokens: 1024,
     });
+    const end = Date.now();
 
     return {
       error: false,
       output: message.content[0].text,
+      speed: end - start,
     };
   },
 });
@@ -114,20 +127,24 @@ export const runTogether = action({
       baseURL: "https://api.together.xyz/v1",
     });
 
+    const start = Date.now();
     const response = await togetherClient.chat.completions.create({
       model: llm,
       messages,
     });
+    const end = Date.now();
 
     if (response.choices[0].message.content === null)
       return {
         output: "Null response received from provider.",
         error: true,
+        speed: 0,
       };
 
     return {
       output: response.choices[0].message.content,
       error: false,
+      speed: end - start,
     };
   },
 });
@@ -137,14 +154,17 @@ export const runGroq = action({
   handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
     const groq = new Groq({ apiKey });
 
+    const start = Date.now();
     const response = await groq.chat.completions.create({
       model: llm,
       messages,
     });
+    const end = Date.now();
 
     return {
       output: response.choices[0].message.content,
       error: false,
+      speed: end - start,
     };
   },
 });
@@ -154,14 +174,17 @@ export const runMistral = action({
   handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
     const mistral = new MistralClient(apiKey);
 
+    const start = Date.now();
     const response = await mistral.chat({
       model: llm,
       messages,
     });
+    const end = Date.now();
 
     return {
       output: response.choices[0].message.content,
       error: false,
+      speed: end - start,
     };
   },
 });

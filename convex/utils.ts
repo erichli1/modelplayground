@@ -11,6 +11,7 @@ export type Message = typeof ConvexMessageType.type;
 export type ModelOutput = {
   output: string;
   error: boolean;
+  speed: number;
 };
 
 export const PROVIDERS_AND_MODELS: Array<{
