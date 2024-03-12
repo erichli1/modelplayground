@@ -7,6 +7,7 @@ import { api } from "./_generated/api";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import Groq from "groq-sdk";
+import MistralClient from "@mistralai/mistralai";
 
 const ProviderType = {
   llm: v.string(),
@@ -39,7 +40,6 @@ export const runModel = action({
     });
     if (model === null) throw new Error("Model not found.");
 
-    // OpenAI, Anthropic, Together, Groq, Google, Mistral
     try {
       if (provider.name === "OpenAI") {
         return await runOpenAI(ctx, { llm: model.llm, messages, apiKey });
@@ -49,16 +49,8 @@ export const runModel = action({
         return await runTogether(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Groq") {
         return await runGroq(ctx, { llm: model.llm, messages, apiKey });
-      } else if (provider.name === "Google") {
-        return {
-          output: "done!",
-          error: false,
-        };
       } else if (provider.name === "Mistral") {
-        return {
-          output: "done!",
-          error: false,
-        };
+        return await runMistral(ctx, { llm: model.llm, messages, apiKey });
       } else {
         throw new Error("Associated provider not implemented.");
       }
@@ -150,11 +142,22 @@ export const runGroq = action({
       messages,
     });
 
-    if (response.choices[0].message.content === null)
-      return {
-        output: "Null response received from provider.",
-        error: true,
-      };
+    return {
+      output: response.choices[0].message.content,
+      error: false,
+    };
+  },
+});
+
+export const runMistral = action({
+  args: ProviderType,
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ModelOutput> => {
+    const mistral = new MistralClient(apiKey);
+
+    const response = await mistral.chat({
+      model: llm,
+      messages,
+    });
 
     return {
       output: response.choices[0].message.content,
