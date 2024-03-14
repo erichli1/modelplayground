@@ -22,6 +22,7 @@ import {
   Brain,
   CircleMinus,
   CirclePlus,
+  Eraser,
   Eye,
   EyeOff,
   SquareRadical,
@@ -50,6 +51,19 @@ type ModelsToCompareType = Array<
   }
 >;
 
+const defaultMessages: Array<Message & { id: string }> = [
+  {
+    role: "system",
+    content: "",
+    id: uuidv4(),
+  },
+  {
+    role: "user",
+    content: "",
+    id: uuidv4(),
+  },
+];
+
 export default function Home() {
   const providers = useQuery(api.myFunctions.getProviders);
   const models = useQuery(api.myFunctions.getModels);
@@ -59,18 +73,8 @@ export default function Home() {
     Array<{ provider: Doc<"providers">; key: string }>
   >([]);
 
-  const [messages, setMessages] = useState<Array<Message & { id: string }>>([
-    {
-      role: "system",
-      content: "",
-      id: uuidv4(),
-    },
-    {
-      role: "user",
-      content: "",
-      id: uuidv4(),
-    },
-  ]);
+  const [messages, setMessages] =
+    useState<Array<Message & { id: string }>>(defaultMessages);
 
   const [modelsToCompare, setModelsToCompare] = useState<ModelsToCompareType>(
     []
@@ -341,10 +345,32 @@ function PromptPanel({
   return (
     <ScrollArea className="h-full pt-4 px-4 overflow-auto">
       <div className="flex flex-col gap-4 overflow-auto">
-        <div className="flex flex-row gap-2 items-center">
-          <p className="font-bold">Add Prompt</p>
-          <TryBenchmarkIcon benchmark="MMLU" />
-          <TryBenchmarkIcon benchmark="GSM8K" />
+        <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row gap-2 items-center">
+            <p className="font-bold">Add prompt</p>
+            <TryBenchmarkIcon benchmark="MMLU" />
+            <TryBenchmarkIcon benchmark="GSM8K" />
+          </div>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-full w-full"
+                  onClick={() => {
+                    setMessages(defaultMessages);
+                    tryBenchmark("");
+                  }}
+                >
+                  <Eraser className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Clear prompts</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         {benchmark !== "" && (
           <p className="text-sm">
@@ -385,6 +411,11 @@ function PromptPanel({
                 autoSize
                 className="resize-none col-span-8"
                 value={message.content}
+                placeholder={
+                  message.role === "system"
+                    ? "You are a helpful assistant."
+                    : `Enter the ${message.role} message here.`
+                }
                 onChange={(e) => {
                   setMessages((prev) =>
                     prev.map((m) =>
