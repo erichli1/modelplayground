@@ -22,9 +22,9 @@ import {
   Brain,
   CircleMinus,
   CirclePlus,
-  Diff,
   Eye,
   EyeOff,
+  SquareRadical,
 } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -328,7 +328,7 @@ function PromptPanel({
             }}
           >
             {benchmark === "MMLU" && <Brain className="h-4 w-4" />}
-            {benchmark === "GSM8K" && <Diff className="h-4 w-4" />}
+            {benchmark === "GSM8K" && <SquareRadical className="h-4 w-4" />}
           </Button>
         </TooltipTrigger>
         <TooltipContent>
