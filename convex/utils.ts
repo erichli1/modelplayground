@@ -8,7 +8,7 @@ export const ConvexMessageType = v.object({
 
 export type Message = typeof ConvexMessageType.type;
 
-export type ModelOutput = ProviderOutput & { cost: number };
+export type ModelOutput = (ProviderOutput & { cost: number }) | "loading";
 
 export const CHARS_TO_TOKEN = 4;
 

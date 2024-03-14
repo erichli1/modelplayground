@@ -113,6 +113,11 @@ export default function Home() {
         )?.key;
         if (identifiedApiKey === undefined) return Promise.resolve();
 
+        updateModelOutput({
+          modelToCompareUuid: model.uuid,
+          output: "loading",
+        });
+
         return runModel({
           providerId: model.provider._id,
           modelId: model._id,
@@ -629,15 +634,18 @@ function ModelCard({
             {model.notes}
           </p>
         )}
-        {model.output && (
-          <>
-            <p>
-              <span>{(model.output.speed / 1000).toFixed(2)}s, </span>
-              <span>~${model.output.cost}</span>
-            </p>
-            <p className="whitespace-pre-wrap">{model.output.output}</p>
-          </>
-        )}
+        {model.output &&
+          (model.output === "loading" ? (
+            <p>Running model...</p>
+          ) : (
+            <>
+              <p>
+                <span>{(model.output.speed / 1000).toFixed(2)}s, </span>
+                <span>~${model.output.cost}</span>
+              </p>
+              <p className="whitespace-pre-wrap">{model.output.output}</p>
+            </>
+          ))}
       </CardContent>
     </Card>
   );
