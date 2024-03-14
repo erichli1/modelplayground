@@ -9,14 +9,6 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Brain,
@@ -43,6 +35,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { PossibleBenchmarks, benchmarks } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type ModelsToCompareType = Array<
   (typeof api.myFunctions.getModels)["_returnType"][0] & {
@@ -492,42 +490,57 @@ function ComparePanel({
   setModelsToCompare: Dispatch<SetStateAction<ModelsToCompareType>>;
   apiKeys: Array<{ provider: Doc<"providers">; key: string }>;
 }) {
-  const [selectedModel, setSelectedModel] = useState<string>("");
-
   return (
     <ScrollArea className="h-full p-4 overflow-auto">
       <div className="flex flex-col gap-4">
         <p className="font-bold">Select models</p>
         <div className="flex flex-col gap-2">
           <div className="p-0.5 flex flex-row gap-1">
-            <Select
-              value={selectedModel}
-              onValueChange={(newVal) => setSelectedModel(newVal)}
+            <DropdownMenu
+            // value={selectedModel}
+            // onValueChange={(newVal) => setSelectedModel(newVal)}
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a model" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {models.map((model) => (
-                    <SelectItem value={model._id} key={model._id}>
-                      <div className="flex flex-row gap-2 items-center">
-                        <Image
-                          src={`/${model.provider.name}.png`}
-                          height={10}
-                          width={10}
-                          alt={`${model.provider.name} logo`}
-                          className="h-4 w-4 rounded-[2px]"
-                          unoptimized
-                        />
-                        {`(${model.provider.name}) ${model.llm}`}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <Button
+              <DropdownMenuTrigger className="w-full">
+                <Button className="w-full">
+                  Add model for comparison{" "}
+                  <CirclePlus className="ml-2 h-4 w-4" />
+                </Button>
+                {/* <SelectValue placeholder="Select a model" /> */}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {/* <SelectGroup> */}
+                {models.map((model) => (
+                  <DropdownMenuItem
+                    // value={model._id}
+                    key={model._id}
+                    onClick={() => {
+                      setModelsToCompare([
+                        ...modelsToCompare,
+                        {
+                          ...model,
+                          uuid: uuidv4(),
+                        },
+                      ]);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex flex-row gap-2 items-center">
+                      <Image
+                        src={`/${model.provider.name}.png`}
+                        height={10}
+                        width={10}
+                        alt={`${model.provider.name} logo`}
+                        className="h-4 w-4 rounded-[2px]"
+                        unoptimized
+                      />
+                      {`(${model.provider.name}) ${model.llm}`}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+                {/* </SelectGroup> */}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {/* <Button
               size="icon"
               variant="ghost"
               disabled={selectedModel === ""}
@@ -545,7 +558,7 @@ function ComparePanel({
               }}
             >
               <CirclePlus className="h-4 w-4" />
-            </Button>
+            </Button> */}
           </div>
 
           {modelsToCompare.map((model) => (
