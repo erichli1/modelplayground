@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internalMutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { PROVIDERS_AND_MODELS, filterNonNull } from "./utils";
 
 export const getProviders = query({
@@ -77,5 +77,14 @@ export const getProviderFromId = query({
   args: { id: v.id("providers") },
   handler: async (ctx, { id }) => {
     return await ctx.db.get(id);
+  },
+});
+
+export const trackUsageStats = mutation({
+  args: { modelStrings: v.array(v.string()) },
+  handler: async (ctx, { modelStrings }) => {
+    await ctx.db.insert("comparisons", {
+      modelStrings: modelStrings,
+    });
   },
 });

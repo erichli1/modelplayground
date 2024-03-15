@@ -26,7 +26,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { useAction, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import Image from "next/image";
@@ -77,6 +77,7 @@ export default function Home() {
   const providers = useQuery(api.myFunctions.getProviders);
   const models = useQuery(api.myFunctions.getModels);
   const runModel = useAction(api.myActions.runModel);
+  const trackUsageStats = useMutation(api.myFunctions.trackUsageStats);
 
   const [apiKeys, setApiKeys] = useState<
     Array<{ provider: Doc<"providers">; key: string }>
@@ -126,6 +127,9 @@ export default function Home() {
     );
 
   const runTests = async () => {
+    await trackUsageStats({
+      modelStrings: modelsToCompare.map((m) => `(${m.provider.name}) ${m.llm}`),
+    }).catch(console.error);
     await Promise.all(
       modelsToCompare.map((model) => {
         const identifiedApiKey = apiKeys.find(

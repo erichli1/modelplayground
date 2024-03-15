@@ -20,6 +20,9 @@ export default defineSchema(
       notes: v.optional(v.string()),
       default: v.boolean(),
     }),
+    comparisons: defineTable({
+      modelStrings: v.array(v.string()),
+    }),
   },
   // If you ever get an error about schema mismatch
   // between your data and your schema, and you cannot
