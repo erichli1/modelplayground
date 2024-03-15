@@ -86,12 +86,17 @@ export default function Home() {
     useState<Array<Message & { id: string }>>(defaultMessages);
 
   const [modelsToCompare, setModelsToCompare] = useState<ModelsToCompareType>(
-    models
-      ?.filter((model) => model.default)
-      .map((model) => ({ ...model, uuid: uuidv4() })) ?? []
+    []
   );
 
-  useEffect(() => {}, [models]);
+  useEffect(() => {
+    if (models)
+      setModelsToCompare(
+        models
+          .filter((model) => model.default)
+          .map((model) => ({ ...model, uuid: uuidv4() }))
+      );
+  }, [models]);
 
   useEffect(() => {
     if (providers)
