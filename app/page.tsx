@@ -12,6 +12,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Brain,
+  ChevronDown,
+  ChevronUp,
   CircleMinus,
   CirclePlus,
   Eraser,
@@ -209,7 +211,11 @@ export default function Home() {
         </header>
         <ResizablePanelGroup direction="horizontal" className="w-full">
           <ResizablePanel defaultSize={15} className="flex flex-col">
-            <APIKeysPanel providers={providers} setApiKeys={setApiKeys} />
+            <APIKeysPanel
+              // providers={providers}
+              apiKeys={apiKeys}
+              setApiKeys={setApiKeys}
+            />
           </ResizablePanel>
           <ResizableHandle />
           <ResizablePanel
@@ -245,10 +251,10 @@ export default function Home() {
 }
 
 function APIKeysPanel({
-  providers,
+  apiKeys,
   setApiKeys,
 }: {
-  providers: Array<Doc<"providers">>;
+  apiKeys: Array<{ provider: Doc<"providers">; key: string }>;
   setApiKeys: Dispatch<
     SetStateAction<
       {
@@ -289,30 +295,31 @@ function APIKeysPanel({
           </TooltipProvider>
         </div>
 
-        {providers.map((provider) => (
+        {apiKeys.map((apiKey) => (
           <div
             className="grid w-full items-center gap-1.5 px-0.5"
-            key={`api-key-provider-${provider._id}`}
+            key={`api-key-provider-${apiKey.provider._id}`}
           >
             <Label>
               <div className="flex flex-row gap-1 items-center">
                 <Image
-                  src={`/${provider.name}.png`}
+                  src={`/${apiKey.provider.name}.png`}
                   height={10}
                   width={10}
-                  alt={`${provider.name} logo`}
+                  alt={`${apiKey.provider.name} logo`}
                   className="h-4 w-4 rounded-[2px]"
                   unoptimized
                 />
-                {provider.name}
+                {apiKey.provider.name}
               </div>
             </Label>
             <Input
               type={showKeys ? "text" : "password"}
+              value={apiKey.key}
               onChange={(e) =>
                 setApiKeys((prev) =>
                   prev.map((p) =>
-                    p.provider._id === provider._id
+                    p.provider._id === apiKey.provider._id
                       ? { ...p, key: e.target.value }
                       : p
                   )
@@ -680,6 +687,8 @@ function ModelCard({
     (apiKey) => apiKey.provider._id === model.provider._id
   );
 
+  const [shorten, setShorten] = useState<boolean>(false);
+
   return (
     <Card
       key={model.uuid}
@@ -698,14 +707,30 @@ function ModelCard({
             />
             <p className="font-bold">{`(${model.provider.name}) ${model.llm}`}</p>
           </div>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-5 w-5"
-            onClick={() => onDeleteClick()}
-          >
-            <CircleMinus className="h-4 w-4" />
-          </Button>
+          <div className="flex flex-row gap-2 items-center">
+            {model.output && (
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-5 w-5"
+                onClick={() => setShorten((prev) => !prev)}
+              >
+                {shorten ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronUp className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-5 w-5"
+              onClick={() => onDeleteClick()}
+            >
+              <CircleMinus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         {(identifiedProviderKey?.key === "" || model.notes) && (
           <p className="italic">
@@ -721,13 +746,17 @@ function ModelCard({
           (model.output === "loading" ? (
             <p>Running model...</p>
           ) : (
-            <>
-              <p>
-                <span>{(model.output.speed / 1000).toFixed(2)}s, </span>
-                <span>~${model.output.cost}</span>
-              </p>
-              <p className="whitespace-pre-wrap">{model.output.output}</p>
-            </>
+            !shorten && (
+              <>
+                <p className="italic">
+                  <span>{(model.output.speed / 1000).toFixed(2)}s, </span>
+                  <span>~${model.output.cost.toFixed(6)}</span>
+                </p>
+                <ScrollArea className="h-full">
+                  <p className="whitespace-pre-wrap">{model.output.output}</p>
+                </ScrollArea>
+              </>
+            )
           ))}
       </CardContent>
     </Card>
