@@ -62,6 +62,36 @@ export const PROVIDERS_AND_MODELS: Array<{
         outputCostPerMillionTokens: 15,
         contextWindow: 200000,
       },
+      {
+        llm: "claude-3-haiku-20240307",
+        inputCostPerMillionTokens: 0.25,
+        outputCostPerMillionTokens: 1.25,
+        contextWindow: 200000,
+      },
+    ],
+  },
+  {
+    provider: "Groq",
+    models: [
+      {
+        llm: "llama2-70b-4096",
+        contextWindow: 4096,
+        inputCostPerMillionTokens: 0.7,
+        outputCostPerMillionTokens: 0.8,
+        default: true,
+      },
+      {
+        llm: "mixtral-8x7b-32768",
+        contextWindow: 32768,
+        inputCostPerMillionTokens: 0.27,
+        outputCostPerMillionTokens: 0.27,
+      },
+      {
+        llm: "gemma-7b-it",
+        contextWindow: 8192,
+        inputCostPerMillionTokens: 0.1,
+        outputCostPerMillionTokens: 0.1,
+      },
     ],
   },
   {
@@ -96,30 +126,6 @@ export const PROVIDERS_AND_MODELS: Array<{
         contextWindow: 4096,
         inputCostPerMillionTokens: 0.2,
         outputCostPerMillionTokens: 0.2,
-      },
-    ],
-  },
-  {
-    provider: "Groq",
-    models: [
-      {
-        llm: "llama2-70b-4096",
-        contextWindow: 4096,
-        inputCostPerMillionTokens: 0.7,
-        outputCostPerMillionTokens: 0.8,
-        default: true,
-      },
-      {
-        llm: "mixtral-8x7b-32768",
-        contextWindow: 32768,
-        inputCostPerMillionTokens: 0.27,
-        outputCostPerMillionTokens: 0.27,
-      },
-      {
-        llm: "gemma-7b-it",
-        contextWindow: 8192,
-        inputCostPerMillionTokens: 0.1,
-        outputCostPerMillionTokens: 0.1,
       },
     ],
   },
