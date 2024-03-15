@@ -147,7 +147,7 @@ export default function Home() {
       <main className="h-screen flex flex-col">
         <header className="px-4 py-2 border-b">
           <div className="flex flex-row justify-between items-center">
-            <p className="font-bold">which model?</p>
+            <p className="font-bold">model playground</p>
             <Dialog>
               <DialogTrigger>
                 <Button variant="outline" className="h-7 shadow-md">
@@ -157,14 +157,13 @@ export default function Home() {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Welcome to the Model Playground!</DialogTitle>
+                  <DialogTitle>model playground instructions</DialogTitle>
                   <DialogDescription>
                     <p>
                       Hi! I&apos;m Eric, a CS student who built this because I
-                      was frustrated at how hard it was to compare outputs from
-                      different models. Here, you can easily compare different
-                      LLMs hosted on different providers based on output
-                      quality, speed, and cost. Here&apos;s how it works:
+                      wanted a way to easily compare different LLMs hosted on
+                      different providers based on output quality, speed, and
+                      cost. Here&apos;s how it works:
                     </p>
                     <br />
                     <ol className="list-decimal ml-8">
@@ -193,6 +192,11 @@ export default function Home() {
                       <li>Select models to compare</li>
                       <li>Hit &quot;Run&quot; at the bottom!</li>
                     </ol>
+                    <br />
+                    <p>
+                      P.S. I&apos;m working on a more robust webapp to help you
+                      iterate and test prompts so stay tuned for that!
+                    </p>
                   </DialogDescription>
                 </DialogHeader>
               </DialogContent>
