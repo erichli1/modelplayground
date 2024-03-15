@@ -707,7 +707,7 @@ function ModelCard({
             />
             <p className="font-bold">{`(${model.provider.name}) ${model.llm}`}</p>
           </div>
-          <div className="flex flex-row gap-2 items-center">
+          <div className="flex flex-row gap-1 items-center">
             {model.output && (
               <Button
                 size="icon"
@@ -742,19 +742,24 @@ function ModelCard({
             {model.notes}
           </p>
         )}
+        <p className="italic">
+          {model.contextWindow} context, $
+          {toFixedIfNotInteger(model.inputCostPerMillionTokens, 2)}/M tokens
+          input, ${toFixedIfNotInteger(model.outputCostPerMillionTokens, 2)}/M
+          tokens output
+        </p>
         {model.output &&
           (model.output === "loading" ? (
             <p>Running model...</p>
           ) : (
             !shorten && (
               <>
-                <p className="italic">
-                  <span>{(model.output.speed / 1000).toFixed(2)}s, </span>
-                  <span>~${model.output.cost.toFixed(6)}</span>
+                <Separator />
+                <p>
+                  {(model.output.speed / 1000).toFixed(2)}s, ~$
+                  {model.output.cost.toFixed(6)}
                 </p>
-                <ScrollArea className="h-full">
-                  <p className="whitespace-pre-wrap">{model.output.output}</p>
-                </ScrollArea>
+                <p className="whitespace-pre-wrap">{model.output.output}</p>
               </>
             )
           ))}
@@ -762,3 +767,6 @@ function ModelCard({
     </Card>
   );
 }
+
+const toFixedIfNotInteger = (num: number, toFixed: number) =>
+  Number.isInteger(num) ? num : num.toFixed(toFixed);
