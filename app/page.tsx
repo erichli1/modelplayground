@@ -710,7 +710,22 @@ function ModelCard({
               className="h-4 w-4 rounded-[2px]"
               unoptimized
             />
-            <p className="font-bold">{`(${model.provider.name}) ${model.llm}`}</p>
+            <TooltipProvider>
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger className="cursor-default">
+                  <p className="font-bold">{`(${model.provider.name}) ${model.llm}`}</p>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    {model.contextWindow.toLocaleString()} context; $
+                    {toFixedIfNotInteger(model.inputCostPerMillionTokens, 2)}/M
+                    tokens input; $
+                    {toFixedIfNotInteger(model.outputCostPerMillionTokens, 2)}/M
+                    tokens output
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <div className="flex flex-row gap-1 items-center">
             {model.output && (
@@ -747,12 +762,6 @@ function ModelCard({
             {model.notes}
           </p>
         )}
-        <p className="italic">
-          {model.contextWindow} context, $
-          {toFixedIfNotInteger(model.inputCostPerMillionTokens, 2)}/M tokens
-          input, ${toFixedIfNotInteger(model.outputCostPerMillionTokens, 2)}/M
-          tokens output
-        </p>
         {model.output &&
           (model.output === "loading" ? (
             <p>Running model...</p>
