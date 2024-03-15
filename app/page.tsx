@@ -768,7 +768,6 @@ function ModelCard({
           ) : (
             !shorten && (
               <>
-                <Separator />
                 <p>
                   {(model.output.speed / 1000).toFixed(2)}s, ~$
                   {model.output.cost.toFixed(6)}
