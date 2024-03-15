@@ -47,6 +47,7 @@ export const addSupportedProvidersAndModels = internalMutation({
               contextWindow: model.contextWindow,
               notes: model.notes,
               lastUpdated: Date.now(),
+              default: model.default ?? false,
             })
           )
         );

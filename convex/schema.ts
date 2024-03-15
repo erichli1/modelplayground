@@ -18,6 +18,7 @@ export default defineSchema(
       outputCostPerMillionTokens: v.number(),
       contextWindow: v.number(),
       notes: v.optional(v.string()),
+      default: v.boolean(),
     }),
   },
   // If you ever get an error about schema mismatch

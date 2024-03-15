@@ -21,7 +21,11 @@ export type ProviderOutput = {
 export const PROVIDERS_AND_MODELS: Array<{
   provider: string;
   models: Array<
-    Omit<Doc<"models">, "_id" | "_creationTime" | "providerId" | "lastUpdated">
+    Omit<
+      Doc<"models">,
+      "_id" | "_creationTime" | "providerId" | "lastUpdated" | "default"
+    > &
+      Partial<Pick<Doc<"models">, "default">>
   >;
 }> = [
   {
@@ -32,6 +36,7 @@ export const PROVIDERS_AND_MODELS: Array<{
         inputCostPerMillionTokens: 10,
         outputCostPerMillionTokens: 30,
         contextWindow: 128000,
+        default: true,
       },
       {
         llm: "gpt-3.5-turbo-0125",
@@ -49,6 +54,7 @@ export const PROVIDERS_AND_MODELS: Array<{
         inputCostPerMillionTokens: 15,
         outputCostPerMillionTokens: 75,
         contextWindow: 200000,
+        default: true,
       },
       {
         llm: "claude-3-sonnet-20240229",
@@ -101,6 +107,7 @@ export const PROVIDERS_AND_MODELS: Array<{
         contextWindow: 4096,
         inputCostPerMillionTokens: 0.7,
         outputCostPerMillionTokens: 0.8,
+        default: true,
       },
       {
         llm: "mixtral-8x7b-32768",
