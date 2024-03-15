@@ -17,6 +17,7 @@ import {
   Eraser,
   Eye,
   EyeOff,
+  Info,
   SquareRadical,
 } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -41,6 +42,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type ModelsToCompareType = Array<
   (typeof api.myFunctions.getModels)["_returnType"][0] & {
@@ -136,7 +145,60 @@ export default function Home() {
   return (
     <>
       <main className="h-screen flex flex-col">
-        <header className="px-4 py-2 border-b">which model?</header>
+        <header className="px-4 py-2 border-b">
+          <div className="flex flex-row justify-between items-center">
+            <p className="font-bold">which model?</p>
+            <Dialog>
+              <DialogTrigger>
+                <Button variant="outline" className="h-7 shadow-md">
+                  <Info className="h-4 w-4 mr-2" />
+                  Instructions
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Welcome to the Model Playground!</DialogTitle>
+                  <DialogDescription>
+                    <p>
+                      Hi! I&apos;m Eric, a CS student who built this because I
+                      was frustrated at how hard it was to compare outputs from
+                      different models. Here, you can easily compare different
+                      LLMs hosted on different providers based on output
+                      quality, speed, and cost. Here&apos;s how it works:
+                    </p>
+                    <br />
+                    <ol className="list-decimal ml-8">
+                      <li>
+                        Add API keys (we never store this! all our code is
+                        public{" "}
+                        <a
+                          href="https://github.com/erichli1/llmcompare"
+                          target="_blank"
+                          className="underline text-blue-500"
+                        >
+                          here
+                        </a>
+                        ).
+                      </li>
+                      <li>
+                        <span>
+                          Add prompts (or choose from one of our suggested
+                          multiple choice
+                        </span>
+                        <Brain className="h-3.5 inline" />
+                        <span>or math reasoning</span>
+                        <SquareRadical className="h-3.5 inline" />
+                        <span>benchmarks)</span>
+                      </li>
+                      <li>Select models to compare</li>
+                      <li>Hit &quot;Run&quot; at the bottom!</li>
+                    </ol>
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </header>
         <ResizablePanelGroup direction="horizontal" className="w-full">
           <ResizablePanel defaultSize={15} className="flex flex-col">
             <APIKeysPanel providers={providers} setApiKeys={setApiKeys} />
@@ -195,6 +257,7 @@ function APIKeysPanel({
       <div className="flex flex-col gap-4">
         <div className="flex flex-row gap-2 items-center">
           <p className="font-bold">Add API keys</p>
+
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger>
@@ -217,6 +280,7 @@ function APIKeysPanel({
             </Tooltip>
           </TooltipProvider>
         </div>
+
         {providers.map((provider) => (
           <div
             className="grid w-full items-center gap-1.5 px-0.5"
@@ -249,6 +313,17 @@ function APIKeysPanel({
             />
           </div>
         ))}
+        <p className="text-xs">
+          We never store these! All our code is public{" "}
+          <a
+            href="https://github.com/erichli1/llmcompare"
+            target="_blank"
+            className="underline text-blue-500"
+          >
+            here
+          </a>{" "}
+          :)
+        </p>
       </div>
     </ScrollArea>
   );
@@ -506,9 +581,9 @@ function ComparePanel({
             // onValueChange={(newVal) => setSelectedModel(newVal)}
             >
               <DropdownMenuTrigger className="w-full">
-                <Button className="w-full">
-                  Add model for comparison{" "}
-                  <CirclePlus className="ml-2 h-4 w-4" />
+                <Button variant="outline" className="w-full shadow-md">
+                  <CirclePlus className="mr-2 h-4 w-4" />
+                  Add model for comparison
                 </Button>
                 {/* <SelectValue placeholder="Select a model" /> */}
               </DropdownMenuTrigger>
