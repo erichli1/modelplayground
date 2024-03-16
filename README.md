@@ -1,21 +1,17 @@
-# Convex + TypeScript + Next.js + Clerk + Tailwind + shadcn/ui
+# model playground
 
-This template provides a minimal setup to get Convex working with [Next.js](https://nextjs.org/). It uses [Clerk](https://clerk.dev/) for user authentication.
+## TLDR
 
-Start by editing `convex/myFunctions.ts` and interact with your Next.js app.
+Easily compare different LLM and provider outputs by quality, speed, and cost.
 
-See Convex docs at https://docs.convex.dev/home
+## Problem
 
-## Setting up
+With fast innovations in foundation models, it's hard to figure out which of the newest models and providers I should be using (ex: should I use Claude 3 Opus instead of GPT4? is the prompt simple enough to run a cheaper open source model?)
 
-```
-npm create convex@latest -t nextjs-clerk-shadcn
-```
+## Solution
 
-Then:
+This tool helps you run the same prompt on multiple different models and providers to get a basic sense of how responses might differ and the comparative speed and cost of each query.
 
-1. Follow steps 1 to 3 in the [Clerk onboarding guide](https://docs.convex.dev/auth/clerk#get-started)
-2. Paste the Issuer URL as `CLERK_JWT_ISSUER_DOMAIN` to your dev deployment environment variable settings on the Convex dashboard (see [docs](https://docs.convex.dev/auth/clerk#configuring-dev-and-prod-instances))
-3. Paste your publishable key as `VITE_CLERK_PUBLISHABLE_KEY="<your publishable key>"` to the `.env.local` file in this directory.
+## Setup
 
-If you want to sync Clerk user data via webhooks, check out this [example repo](https://github.com/thomasballinger/convex-clerk-users-table/).
+`npm i` installs the necessary packages and `npm run dev` runs the app locally. Note this project is built on top of [Convex](https://www.convex.dev/) and running locally or deploying it would require an account there.
