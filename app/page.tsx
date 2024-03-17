@@ -52,6 +52,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useMedia } from "react-use";
 
 type ModelsToCompareType = Array<
   (typeof api.myFunctions.getModels)["_returnType"][0] & {
@@ -74,6 +75,10 @@ const defaultMessages: Array<Message & { id: string }> = [
 ];
 
 export default function Home() {
+  const isWide = useMedia("(min-width: 640px)", true);
+  const [displaySmallWarning, setDisplaySmallWarning] =
+    useState<boolean>(false);
+
   const providers = useQuery(api.myFunctions.getProviders);
   const models = useQuery(api.myFunctions.getModels);
   const runModel = useAction(api.myActions.runModel);
@@ -118,6 +123,30 @@ export default function Home() {
       return updatedModels;
     });
   };
+
+  useEffect(() => {
+    setDisplaySmallWarning(!isWide);
+  }, [isWide]);
+
+  if (displaySmallWarning)
+    return (
+      <div className="flex flex-col items-center text-center justify-center h-screen mx-auto px-2 gap-2">
+        <p>
+          model playground is a tool to help you compare model outputs across
+          different LLMs and providers based on quality, speed, and cost.
+          Unfortunately, it doesn&apos;t work quite right on smaller screens so
+          please use a larger one! Here&apos;s a quick demo though :)
+        </p>
+        <video
+          src="/modelplayground.mp4"
+          autoPlay
+          playsInline
+          className="w-full"
+          controls
+          muted
+        />
+      </div>
+    );
 
   if (providers === undefined || models === undefined)
     return (
