@@ -188,6 +188,18 @@ export const PROVIDERS_AND_MODELS: Array<{
       },
     ],
   },
+  {
+    provider: "Cohere",
+    models: [
+      {
+        llm: "command-r-plus",
+        contextWindow: 128000,
+        inputCostPerMillionTokens: 3,
+        outputCostPerMillionTokens: 15,
+        default: true,
+      },
+    ],
+  },
 ];
 
 export function filterNonNull<T>(array: Array<T | null>): T[] {

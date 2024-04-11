@@ -13,6 +13,8 @@ import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import Groq from "groq-sdk";
 import MistralClient from "@mistralai/mistralai";
+import { CohereClient } from "cohere-ai";
+import { ChatMessageRole } from "cohere-ai/api";
 
 const ProviderType = {
   llm: v.string(),
@@ -63,6 +65,8 @@ export const runModel = action({
         output = await runGroq(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Mistral") {
         output = await runMistral(ctx, { llm: model.llm, messages, apiKey });
+      } else if (provider.name === "Cohere") {
+        output = await runCohere(ctx, { llm: model.llm, messages, apiKey });
       } else {
         throw new Error("Associated provider not implemented.");
       }
@@ -87,6 +91,40 @@ export const runModel = action({
       else
         return { output: "An error occurred.", error: true, speed: 0, cost: 0 };
     }
+  },
+});
+
+export const runCohere = action({
+  args: ProviderType,
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ProviderOutput> => {
+    const cohere = new CohereClient({ token: apiKey });
+
+    const message = messages[messages.length - 1].content;
+    const chatHistory = messages
+      .map((m) => ({
+        role:
+          m.role === "user"
+            ? ChatMessageRole.User
+            : m.role === "system"
+            ? ChatMessageRole.System
+            : ChatMessageRole.Chatbot,
+        message: m.content,
+      }))
+      .slice(0, -1);
+
+    const start = Date.now();
+    const response = await cohere.chat({
+      model: llm,
+      message,
+      chatHistory,
+    });
+    const end = Date.now();
+
+    return {
+      output: response.text,
+      error: false,
+      speed: end - start,
+    };
   },
 });
 
