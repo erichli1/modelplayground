@@ -333,6 +333,11 @@ function APIKeysPanel({
           </TooltipProvider>
         </div>
 
+        <p className="text-xs">
+          <div className="inline">You can copy/paste a .env file too! </div>
+          <div className="inline break-all">(PROVIDER_API_KEY=xxxx)</div>
+        </p>
+
         {apiKeys.map((apiKey) => (
           <div
             className="grid w-full items-center gap-1.5 px-0.5"
@@ -363,6 +368,34 @@ function APIKeysPanel({
                   )
                 )
               }
+              onPaste={(e) => {
+                const pasteContent = e.clipboardData
+                  .getData("text")
+                  .trim()
+                  .split("\n")
+                  .map((line) =>
+                    line
+                      .trim()
+                      .split("=")
+                      .map((l) => l.trim())
+                  );
+
+                // If not a copy/pasted .env file, just directly paste
+                if (pasteContent.length === 1 && pasteContent[0].length === 1)
+                  return;
+
+                e.preventDefault();
+
+                setApiKeys((prev) =>
+                  prev.map((p) => {
+                    const foundKey = pasteContent.find(
+                      (line) =>
+                        line[0] === `${p.provider.name.toUpperCase()}_API_KEY`
+                    );
+                    return foundKey ? { ...p, key: foundKey[1] } : p;
+                  })
+                );
+              }}
             />
           </div>
         ))}
