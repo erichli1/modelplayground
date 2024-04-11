@@ -32,11 +32,17 @@ export const PROVIDERS_AND_MODELS: Array<{
     provider: "OpenAI",
     models: [
       {
+        llm: "gpt-4-turbo",
+        contextWindow: 128000,
+        inputCostPerMillionTokens: 10,
+        outputCostPerMillionTokens: 30,
+        default: true,
+      },
+      {
         llm: "gpt-4-0125-preview",
         inputCostPerMillionTokens: 10,
         outputCostPerMillionTokens: 30,
         contextWindow: 128000,
-        default: true,
       },
       {
         llm: "gpt-3.5-turbo-0125",
@@ -54,7 +60,6 @@ export const PROVIDERS_AND_MODELS: Array<{
         inputCostPerMillionTokens: 15,
         outputCostPerMillionTokens: 75,
         contextWindow: 200000,
-        default: true,
       },
       {
         llm: "claude-3-sonnet-20240229",
@@ -78,7 +83,6 @@ export const PROVIDERS_AND_MODELS: Array<{
         contextWindow: 4096,
         inputCostPerMillionTokens: 0.7,
         outputCostPerMillionTokens: 0.8,
-        default: true,
       },
       {
         llm: "mixtral-8x7b-32768",
@@ -126,6 +130,13 @@ export const PROVIDERS_AND_MODELS: Array<{
         contextWindow: 4096,
         inputCostPerMillionTokens: 0.2,
         outputCostPerMillionTokens: 0.2,
+      },
+      {
+        llm: "databricks/dbrx-instruct",
+        contextWindow: 32000,
+        inputCostPerMillionTokens: 1.2,
+        outputCostPerMillionTokens: 1.2,
+        default: true,
       },
     ],
   },

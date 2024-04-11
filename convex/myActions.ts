@@ -154,6 +154,9 @@ export const runTogether = action({
     const response = await togetherClient.chat.completions.create({
       model: llm,
       messages,
+      // 4/10/24: Need to add a max_tokens, else dbrx-instruct returns early
+      // TODO: remove this when no longer needed
+      max_tokens: 1024,
     });
     const end = Date.now();
 
