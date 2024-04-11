@@ -673,7 +673,7 @@ function ComparePanel({
                 </Button>
                 {/* <SelectValue placeholder="Select a model" /> */}
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent className="max-h-[80vh] overflow-auto">
                 {/* <SelectGroup> */}
                 {models.map((model) => (
                   <DropdownMenuItem
@@ -788,6 +788,7 @@ function ModelCard({
                     tokens input; $
                     {toFixedIfNotInteger(model.outputCostPerMillionTokens, 2)}/M
                     tokens output
+                    {model.requestCost && ` $${model.requestCost} request cost`}
                   </p>
                 </TooltipContent>
               </Tooltip>

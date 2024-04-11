@@ -200,6 +200,25 @@ export const PROVIDERS_AND_MODELS: Array<{
       },
     ],
   },
+  {
+    provider: "Perplexity",
+    models: [
+      {
+        llm: "sonar-small-online",
+        contextWindow: 12000,
+        inputCostPerMillionTokens: 0.2,
+        outputCostPerMillionTokens: 0.2,
+        requestCost: 0.005,
+      },
+      {
+        llm: "sonar-medium-online",
+        contextWindow: 12000,
+        inputCostPerMillionTokens: 0.6,
+        outputCostPerMillionTokens: 0.6,
+        requestCost: 0.005,
+      },
+    ],
+  },
 ];
 
 export function filterNonNull<T>(array: Array<T | null>): T[] {

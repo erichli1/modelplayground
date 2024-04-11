@@ -67,6 +67,8 @@ export const runModel = action({
         output = await runMistral(ctx, { llm: model.llm, messages, apiKey });
       } else if (provider.name === "Cohere") {
         output = await runCohere(ctx, { llm: model.llm, messages, apiKey });
+      } else if (provider.name === "Perplexity") {
+        output = await runPerplexity(ctx, { llm: model.llm, messages, apiKey });
       } else {
         throw new Error("Associated provider not implemented.");
       }
@@ -81,7 +83,8 @@ export const runModel = action({
         ...output,
         cost:
           inputMillionTokens * model.inputCostPerMillionTokens +
-          outputMillionTokens * model.outputCostPerMillionTokens,
+          outputMillionTokens * model.outputCostPerMillionTokens +
+          (model.requestCost ?? 0),
       };
     } catch (e) {
       if (typeof e === "string")
@@ -122,6 +125,45 @@ export const runCohere = action({
 
     return {
       output: response.text,
+      error: false,
+      speed: end - start,
+    };
+  },
+});
+
+export const runPerplexity = action({
+  args: ProviderType,
+  handler: async (_ctx, { llm, messages, apiKey }): Promise<ProviderOutput> => {
+    const perplexityClient = new OpenAI({
+      apiKey,
+      baseURL: "https://api.perplexity.ai",
+    });
+
+    // From Perplexity, it is recommended to use only single-turn
+    // conversations and avoid system prompts for the online LLMs
+    const singleMessage = messages.map((m) => m.content).join("\n");
+
+    const start = Date.now();
+    const response = await perplexityClient.chat.completions.create({
+      model: llm,
+      messages: [
+        {
+          role: "user",
+          content: singleMessage,
+        },
+      ],
+    });
+    const end = Date.now();
+
+    if (response.choices[0].message.content === null)
+      return {
+        output: "Null response received from provider.",
+        error: true,
+        speed: 0,
+      };
+
+    return {
+      output: response.choices[0].message.content,
       error: false,
       speed: end - start,
     };

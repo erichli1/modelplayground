@@ -19,6 +19,7 @@ export default defineSchema(
       contextWindow: v.number(),
       notes: v.optional(v.string()),
       default: v.boolean(),
+      requestCost: v.optional(v.number()),
     }),
     comparisons: defineTable({
       modelStrings: v.array(v.string()),

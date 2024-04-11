@@ -38,18 +38,16 @@ export const addSupportedProvidersAndModels = internalMutation({
           name: providerAndModels.provider,
         });
         await Promise.all(
-          providerAndModels.models.map((model) =>
-            ctx.db.insert("models", {
+          providerAndModels.models.map((model) => {
+            const { default: defaultVal = false } = model;
+
+            return ctx.db.insert("models", {
               providerId: providerId,
-              llm: model.llm,
-              inputCostPerMillionTokens: model.inputCostPerMillionTokens,
-              outputCostPerMillionTokens: model.outputCostPerMillionTokens,
-              contextWindow: model.contextWindow,
-              notes: model.notes,
               lastUpdated: Date.now(),
-              default: model.default ?? false,
-            })
-          )
+              default: defaultVal,
+              ...model,
+            });
+          })
         );
       })
     );
