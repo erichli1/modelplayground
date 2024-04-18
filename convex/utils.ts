@@ -36,7 +36,6 @@ export const PROVIDERS_AND_MODELS: Array<{
         contextWindow: 128000,
         inputCostPerMillionTokens: 10,
         outputCostPerMillionTokens: 30,
-        default: true,
       },
       {
         llm: "gpt-4-0125-preview",
@@ -114,6 +113,26 @@ export const PROVIDERS_AND_MODELS: Array<{
         outputCostPerMillionTokens: 0.1,
       },
       {
+        llm: "mistralai/Mixtral-8x22B-Instruct-v0.1",
+        contextWindow: 65536,
+        inputCostPerMillionTokens: 1.2,
+        outputCostPerMillionTokens: 1.2,
+        default: true,
+      },
+      {
+        llm: "meta-llama/Llama-3-70b-chat-hf",
+        contextWindow: 8000,
+        inputCostPerMillionTokens: 0.9,
+        outputCostPerMillionTokens: 0.9,
+        default: true,
+      },
+      {
+        llm: "meta-llama/Llama-3-8b-chat-hf",
+        contextWindow: 8000,
+        inputCostPerMillionTokens: 0.2,
+        outputCostPerMillionTokens: 0.2,
+      },
+      {
         llm: "meta-llama/Llama-2-70b-chat-hf",
         contextWindow: 4096,
         inputCostPerMillionTokens: 0.9,
@@ -122,8 +141,8 @@ export const PROVIDERS_AND_MODELS: Array<{
       {
         llm: "meta-llama/Llama-2-13b-chat-hf",
         contextWindow: 4096,
-        inputCostPerMillionTokens: 0.225,
-        outputCostPerMillionTokens: 0.225,
+        inputCostPerMillionTokens: 0.3,
+        outputCostPerMillionTokens: 0.3,
       },
       {
         llm: "meta-llama/Llama-2-7b-chat-hf",
@@ -136,7 +155,6 @@ export const PROVIDERS_AND_MODELS: Array<{
         contextWindow: 32000,
         inputCostPerMillionTokens: 1.2,
         outputCostPerMillionTokens: 1.2,
-        default: true,
       },
     ],
   },
@@ -196,7 +214,6 @@ export const PROVIDERS_AND_MODELS: Array<{
         contextWindow: 128000,
         inputCostPerMillionTokens: 3,
         outputCostPerMillionTokens: 15,
-        default: true,
       },
     ],
   },
