@@ -78,10 +78,17 @@ export const PROVIDERS_AND_MODELS: Array<{
     provider: "Groq",
     models: [
       {
-        llm: "llama2-70b-4096",
-        contextWindow: 4096,
-        inputCostPerMillionTokens: 0.7,
-        outputCostPerMillionTokens: 0.8,
+        llm: "llama3-8b-8192",
+        contextWindow: 8192,
+        inputCostPerMillionTokens: 0.05,
+        outputCostPerMillionTokens: 0.1,
+      },
+      {
+        llm: "llama3-70b-8192",
+        contextWindow: 8192,
+        inputCostPerMillionTokens: 0.59,
+        outputCostPerMillionTokens: 0.79,
+        default: true,
       },
       {
         llm: "mixtral-8x7b-32768",
@@ -124,7 +131,6 @@ export const PROVIDERS_AND_MODELS: Array<{
         contextWindow: 8000,
         inputCostPerMillionTokens: 0.9,
         outputCostPerMillionTokens: 0.9,
-        default: true,
       },
       {
         llm: "meta-llama/Llama-3-8b-chat-hf",
@@ -132,24 +138,24 @@ export const PROVIDERS_AND_MODELS: Array<{
         inputCostPerMillionTokens: 0.2,
         outputCostPerMillionTokens: 0.2,
       },
-      {
-        llm: "meta-llama/Llama-2-70b-chat-hf",
-        contextWindow: 4096,
-        inputCostPerMillionTokens: 0.9,
-        outputCostPerMillionTokens: 0.9,
-      },
-      {
-        llm: "meta-llama/Llama-2-13b-chat-hf",
-        contextWindow: 4096,
-        inputCostPerMillionTokens: 0.3,
-        outputCostPerMillionTokens: 0.3,
-      },
-      {
-        llm: "meta-llama/Llama-2-7b-chat-hf",
-        contextWindow: 4096,
-        inputCostPerMillionTokens: 0.2,
-        outputCostPerMillionTokens: 0.2,
-      },
+      // {
+      //   llm: "meta-llama/Llama-2-70b-chat-hf",
+      //   contextWindow: 4096,
+      //   inputCostPerMillionTokens: 0.9,
+      //   outputCostPerMillionTokens: 0.9,
+      // },
+      // {
+      //   llm: "meta-llama/Llama-2-13b-chat-hf",
+      //   contextWindow: 4096,
+      //   inputCostPerMillionTokens: 0.3,
+      //   outputCostPerMillionTokens: 0.3,
+      // },
+      // {
+      //   llm: "meta-llama/Llama-2-7b-chat-hf",
+      //   contextWindow: 4096,
+      //   inputCostPerMillionTokens: 0.2,
+      //   outputCostPerMillionTokens: 0.2,
+      // },
       {
         llm: "databricks/dbrx-instruct",
         contextWindow: 32000,
@@ -221,15 +227,15 @@ export const PROVIDERS_AND_MODELS: Array<{
     provider: "Perplexity",
     models: [
       {
-        llm: "sonar-small-online",
-        contextWindow: 12000,
+        llm: "llama-3-sonar-small-32k-online",
+        contextWindow: 28000,
         inputCostPerMillionTokens: 0.2,
         outputCostPerMillionTokens: 0.2,
         requestCost: 0.005,
       },
       {
-        llm: "sonar-medium-online",
-        contextWindow: 12000,
+        llm: "llama-3-sonar-large-32k-online",
+        contextWindow: 28000,
         inputCostPerMillionTokens: 0.6,
         outputCostPerMillionTokens: 0.6,
         requestCost: 0.005,
