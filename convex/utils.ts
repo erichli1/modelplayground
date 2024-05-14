@@ -32,6 +32,13 @@ export const PROVIDERS_AND_MODELS: Array<{
     provider: "OpenAI",
     models: [
       {
+        llm: "gpt-4o",
+        contextWindow: 128000,
+        inputCostPerMillionTokens: 5,
+        outputCostPerMillionTokens: 15,
+        default: true,
+      },
+      {
         llm: "gpt-4-turbo",
         contextWindow: 128000,
         inputCostPerMillionTokens: 10,
@@ -124,7 +131,6 @@ export const PROVIDERS_AND_MODELS: Array<{
         contextWindow: 65536,
         inputCostPerMillionTokens: 1.2,
         outputCostPerMillionTokens: 1.2,
-        default: true,
       },
       {
         llm: "meta-llama/Llama-3-70b-chat-hf",
